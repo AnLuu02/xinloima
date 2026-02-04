@@ -469,7 +469,7 @@
                 const { data, error } = await _supabase.from('visitors').select('*').limit(1);
                 if (error) throw error;
                 if (data.length === 0) {
-                    await _supabase.from('visitors').insert([{ device_info: userAgent, note: 'The One' }]);
+                    await _supabase.from('visitors').insert([{ device_info: userAgent }]);
                     localStorage.setItem('is_my_love', 'true');
                     return true;
                 } else return false;
