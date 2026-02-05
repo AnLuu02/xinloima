@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gửi người thương...</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gửi cổ...</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Dancing+Script:wght@400;700&family=Montserrat:wght@300;400;500&display=swap"
-        rel="stylesheet">
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Dancing+Script:wght@400;700&family=Montserrat:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -21,381 +21,392 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
-        :root {
-            --bg-color: #050505;
-            --text-color: #e0e0e0;
-            --accent-color: #bfa2db;
-            --heart-color: #ff8fa3;
-            --font-heading: 'Cinzel', serif;
-            --font-body: 'Montserrat', sans-serif;
-            --font-script: 'Dancing Script', cursive;
+      :root {
+        --bg-color: #050505;
+        --text-color: #e0e0e0;
+        --accent-color: #bfa2db;
+        --heart-color: #ff8fa3;
+        --font-heading: "Cinzel", serif;
+        --font-body: "Montserrat", sans-serif;
+        --font-script: "Dancing Script", cursive;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: var(--font-script);
+        width: 100vw !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        perspective: 1000px;
+      }
+
+      /* Ambient Glow Effect */
+      #ambient-light {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80vh;
+        height: 80vh;
+        background: radial-gradient(
+          circle,
+          rgba(191, 162, 219, 0.08) 0%,
+          rgba(138, 43, 226, 0.02) 40%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 2s;
+        animation: breathe-light 6s ease-in-out infinite alternate;
+      }
+
+      @keyframes breathe-light {
+        0% {
+          opacity: 0.3;
+          transform: translate(-50%, -50%) scale(0.8);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
+        100% {
+          opacity: 0.6;
+          transform: translate(-50%, -50%) scale(1.1);
+        }
+      }
+
+      /* Sparkles */
+      .sparkle {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 15;
+        box-shadow:
+          0 0 10px rgba(255, 255, 255, 0.8),
+          0 0 20px var(--accent-color);
+      }
+
+      /* Loading / Entry Screen */
+      #entry-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: opacity 1.5s ease;
+      }
+
+      .envelope-container {
+        position: relative;
+        width: 150px;
+        height: 100px;
+        margin-bottom: 40px;
+      }
+
+      #entry-text {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        opacity: 0.8;
+        margin-top: 20px;
+        text-transform: uppercase;
+      }
+
+      /* Access Denied Screen */
+      #denied-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        z-index: 10000;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+      }
+
+      #denied-screen h2 {
+        font-family: var(--font-heading);
+        color: #ff4d4d;
+        font-size: 2rem;
+        margin-bottom: 20px;
+      }
+
+      /* Main Display Area */
+      #display-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 10;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .text-content {
+        font-size: 4rem;
+        line-height: 1.3;
+        color: #fff;
+        text-shadow: 0 0 20px rgba(191, 162, 219, 0.6);
+        display: none;
+        width: 100%;
+        word-wrap: break-word;
+      }
+
+      .char-wrap {
+        display: inline-block;
+        white-space: pre;
+        transform-style: preserve-3d;
+        will-change: transform, opacity;
+      }
+
+      .highlight {
+        color: var(--accent-color);
+        font-weight: bold;
+        text-shadow: 0 0 30px var(--accent-color);
+      }
+
+      .heart-big {
+        font-size: 10rem;
+        color: var(--heart-color);
+        filter: drop-shadow(0 0 30px var(--heart-color));
+      }
+
+      /* Final Letter Styling */
+      #final-letter-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        /* Darken background */
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        /* Enabled via JS */
+        padding: 20px;
+      }
+
+      .paper {
+        background: #fffcf5;
+        /* Cream paper color */
+        color: #333;
+        /* Dark ink */
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        padding: 40px;
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        font-family: "Dancing Script", cursive;
+        font-size: 1.3rem;
+        line-height: 1.6;
+        overflow-y: auto;
+        /* Allow scrolling if too long */
+        transform: translateY(50px) rotateX(10deg);
+        transform-origin: top center;
+        opacity: 0;
+        position: relative;
+      }
+
+      /* Custom Scrollbar for letter */
+      .paper::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .paper::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .paper::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+      }
+
+      .paper h2 {
+        font-family: var(--font-heading);
+        text-align: center;
+        margin-bottom: 20px;
+        color: #000;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+      }
+
+      .paper p {
+        margin-bottom: 15px;
+        text-align: justify;
+      }
+
+      .paper .signature {
+        margin-top: 40px;
+        text-align: right;
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+
+      .paper .highlight {
+        color: #d63384;
+        /* Pinkish ink for highlights in paper */
+        text-shadow: none;
+        font-weight: 700;
+      }
+
+      .paper-heart {
+        text-align: center;
+        color: #d63384;
+        font-size: 2rem;
+        margin: 20px 0;
+      }
+
+      /* Music specific */
+      #music-control {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 100;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: color 0.3s;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      #music-control:hover {
+        color: #fff;
+      }
+
+      /* Envelope Art */
+      .envelope {
+        width: 100px;
+        height: 60px;
+        background: #333;
+        position: relative;
+        margin: 0 auto;
+        border-radius: 0 0 5px 5px;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+      }
+
+      .envelope:before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 35px solid #444;
+        top: -35px;
+        left: 0;
+      }
+
+      .heart-seal {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--heart-color);
+        font-size: 30px;
+        filter: drop-shadow(0 0 10px var(--heart-color));
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: translateX(-50%) scale(1);
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-script);
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-            perspective: 1000px;
+        50% {
+          transform: translateX(-50%) scale(1.2);
         }
 
-        /* Ambient Glow Effect */
-        #ambient-light {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80vh;
-            height: 80vh;
-            background: radial-gradient(circle, rgba(191, 162, 219, 0.08) 0%, rgba(138, 43, 226, 0.02) 40%, rgba(0, 0, 0, 0) 70%);
-            z-index: 2;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 2s;
-            animation: breathe-light 6s ease-in-out infinite alternate;
+        100% {
+          transform: translateX(-50%) scale(1);
         }
+      }
 
-        @keyframes breathe-light {
-            0% {
-                opacity: 0.3;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
+      /* Background Canvas */
+      .background-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
 
-            100% {
-                opacity: 0.6;
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-        }
-
-        /* Sparkles */
-        .sparkle {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 15;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px var(--accent-color);
-        }
-
-        /* Loading / Entry Screen */
-        #entry-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: opacity 1.5s ease;
-        }
-
-        .envelope-container {
-            position: relative;
-            width: 150px;
-            height: 100px;
-            margin-bottom: 40px;
-        }
-
-        #entry-text {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            opacity: 0.8;
-            margin-top: 20px;
-            text-transform: uppercase;
-        }
-
-        /* Access Denied Screen */
-        #denied-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 10000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #denied-screen h2 {
-            font-family: var(--font-heading);
-            color: #ff4d4d;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        /* Main Display Area */
-        #display-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 10;
-            pointer-events: none;
-        }
-
+      /* Mobile specific adjustments */
+      @media (max-width: 768px) {
         .text-content {
-            font-size: 4rem;
-            line-height: 1.3;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(191, 162, 219, 0.6);
-            display: none;
-            width: 100%;
-            word-wrap: break-word;
-        }
-
-        .char-wrap {
-            display: inline-block;
-            white-space: pre;
-            transform-style: preserve-3d;
-            will-change: transform, opacity;
-        }
-
-        .highlight {
-            color: var(--accent-color);
-            font-weight: bold;
-            text-shadow: 0 0 30px var(--accent-color);
+          font-size: 2.2rem;
         }
 
         .heart-big {
-            font-size: 10rem;
-            color: var(--heart-color);
-            filter: drop-shadow(0 0 30px var(--heart-color));
-        }
-
-        /* Final Letter Styling */
-        #final-letter-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            /* Darken background */
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            /* Enabled via JS */
-            padding: 20px;
+          font-size: 6rem;
         }
 
         .paper {
-            background: #fffcf5;
-            /* Cream paper color */
-            color: #333;
-            /* Dark ink */
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            padding: 40px;
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.3rem;
-            line-height: 1.6;
-            overflow-y: auto;
-            /* Allow scrolling if too long */
-            transform: translateY(50px) rotateX(10deg);
-            transform-origin: top center;
-            opacity: 0;
-            position: relative;
+          padding: 25px;
+          font-size: 1.1rem;
         }
-
-        /* Custom Scrollbar for letter */
-        .paper::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .paper::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .paper::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 3px;
-        }
-
-        .paper h2 {
-            font-family: var(--font-heading);
-            text-align: center;
-            margin-bottom: 20px;
-            color: #000;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-        .paper p {
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .paper .signature {
-            margin-top: 40px;
-            text-align: right;
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-
-        .paper .highlight {
-            color: #d63384;
-            /* Pinkish ink for highlights in paper */
-            text-shadow: none;
-            font-weight: 700;
-        }
-
-        .paper-heart {
-            text-align: center;
-            color: #d63384;
-            font-size: 2rem;
-            margin: 20px 0;
-        }
-
-        /* Music specific */
-        #music-control {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 100;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: color 0.3s;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #music-control:hover {
-            color: #fff;
-        }
-
-        /* Envelope Art */
-        .envelope {
-            width: 100px;
-            height: 60px;
-            background: #333;
-            position: relative;
-            margin: 0 auto;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
-        }
-
-        .envelope:before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 50px solid transparent;
-            border-right: 50px solid transparent;
-            border-bottom: 35px solid #444;
-            top: -35px;
-            left: 0;
-        }
-
-        .heart-seal {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--heart-color);
-            font-size: 30px;
-            filter: drop-shadow(0 0 10px var(--heart-color));
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translateX(-50%) scale(1);
-            }
-
-            50% {
-                transform: translateX(-50%) scale(1.2);
-            }
-
-            100% {
-                transform: translateX(-50%) scale(1);
-            }
-        }
-
-        /* Background Canvas */
-        .background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* Mobile specific adjustments */
-        @media (max-width: 768px) {
-            .text-content {
-                font-size: 2.2rem;
-            }
-
-            .heart-big {
-                font-size: 6rem;
-            }
-
-            .paper {
-                padding: 25px;
-                font-size: 1.1rem;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <!-- Access Denied Screen -->
     <div id="denied-screen">
-        <h2>Trang này không dành cho bạn</h2>
-        <p>Đây là không gian dành riêng cho người phụ nữ duy nhất trong trái tim tôi.</p>
+      <h2>Trang này không dành cho bạn</h2>
+      <p>
+        Đây là không gian dành riêng cho người phụ nữ duy nhất trong trái tim
+        tôi.
+      </p>
     </div>
 
     <!-- Entry Screen -->
     <div id="entry-screen">
-        <div class="envelope-container">
-            <div class="envelope"></div>
-            <div class="heart-seal">❤</div>
-        </div>
-        <div id="entry-text">Anh có điều muốn nói...</div>
-        <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.5;">(Chạm để mở)</div>
+      <div class="envelope-container">
+        <div class="envelope"></div>
+        <div class="heart-seal">❤</div>
+      </div>
+      <div id="entry-text">Ảnh có điều muốn nói...</div>
+      <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.5">
+        (Chạm để mở)
+      </div>
     </div>
 
     <!-- Final Letter Overlay -->
     <div id="final-letter-overlay">
-        <div class="paper" id="final-letter-content">
-            <!-- Content will be injected here -->
-        </div>
+      <div class="paper" id="final-letter-content">
+        <!-- Content will be injected here -->
+      </div>
     </div>
 
     <canvas id="bg-canvas" class="background-canvas"></canvas>
@@ -405,390 +416,495 @@
 
     <!-- Music Control -->
     <div id="music-control">
-        <span id="music-icon">🔇</span>
-        <span id="music-text">Bật nhạc</span>
+      <span id="music-icon">🔇</span>
+      <span id="music-text">Bật nhạc</span>
     </div>
 
     <!-- Main Content Area -->
     <div id="display-container"></div>
 
     <script>
-        // CONFIG
-        const SUPABASE_URL = 'https://ebkayysfasvqrpiuikzu.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_ZRxjIxnm_dNK4yMq5r_xDw_8g3n1l0E';
-        const MUSIC_URL = './assets/lily.mp3';
+      // CONFIG
+      const SUPABASE_URL = "https://ebkayysfasvqrpiuikzu.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_ZRxjIxnm_dNK4yMq5r_xDw_8g3n1l0E";
+      const MUSIC_URL = "./assets/lily.mp3";
 
-        // CONTENT DATA
-        const messages = [
-            { text: "<span class='highlight'>Gửi Ẻm…</span>", type: "heading", size: "5.2rem" },
-            { text: "(người hay blame đồng đội giống Ảnh)", type: "subheading" },
+      // CONTENT DATA
+      const messages = [
+        {
+          text: "<span class='highlight'>Gửi Cổ...</span>",
+          type: "heading",
+          size: "5.2rem"
+        },
+        {
+          text: "-/- người hay blame đồng đội giống ảnh (●'◡'●) -/-",
+          type: "subheading"
+        },
 
-            { text: "Cho Ảnh giải thích đi.", type: "normal" },
-            { text: "Hết ván là Ẻm block liền vậy là xử Ảnh hơi gắt đó 😅", type: "normal" },
+        { text: "Cho Ảnh giải thích đi...", type: "normal" },
+        {
+          text: "Cổ block vậy là xử ảnh hơi gắt đó -_-",
+          type: "normal"
+        },
 
-            { text: "Ảnh hay trêu ẻm mà…", type: "heading", size: "4.8rem" },
+        { text: "Ảnh hay trêu Cổ mà…", type: "heading", size: "4.8rem" },
 
-            { text: "Ảnh trêu Ẻm cho vui thôi, chứ không phải bênh ai bỏ ai hết.", type: "normal" },
-            { text: "Thấy Ẻm hay blame giống Ảnh quá nên Ảnh mới nói vậy.", type: "normal" },
-            { text: "Ai ngờ Ẻm hiểu thiệt luôn 😭", type: "normal" },
+        {
+          text: "Ảnh trêu Cổ vui thôi mà, chứ không phải bênh ai bỏ ai đâu. ( ͡• ͜ʖ ͡• )",
+          type: "normal"
+        },
+        {
+          text: "Thấy Cổ hay blame giống Ảnh quá nên Ảnh mới nói vậy.",
+          type: "normal"
+        },
+        { text: "Ai ngờ Cổ hiểu lầm thiệt luôn :)))", type: "normal" },
 
-            { text: "Ảnh nhận là lúc đó nói hơi ngu, hơi cà khịa quá đà.", type: "normal" },
-            { text: "Nhưng nếu không quan tâm thì Ảnh đã không cần giải thích thế này.", type: "normal" },
+        {
+          text: "Lúc đó hơi quá thật kkkk",
+          type: "normal"
+        },
+        {
+          text: "Nhưng nếu không quan tâm thì Ảnh đã không cần giải thích thế này.",
+          type: "normal"
+        },
 
-            { text: "❤", type: "heart", class: "heart-big" },
+        { text: "❤", type: "heart", class: "heart-big" },
 
-            { text: "Ảnh quen chơi chung với Ẻm rồi, thiếu thiếu sao á.", type: "normal" },
-            { text: "Nên mới phải nhắn cho rõ, chứ không phải im im cho xong.", type: "normal" },
+        {
+          text: "Ảnh quen chơi chung với Cổ rồi, thiếu thiếu sao ấy.",
+          type: "normal"
+        },
+        {
+          text: "Tha thứ cho ảnh đi mòoo",
+          type: "normal"
+        },
 
-            { text: "Nếu Ẻm còn giận thì Ảnh chịu.", type: "normal" },
-            { text: "Còn nếu Ẻm hiểu rồi…", type: "normal" },
-            { text: "Thì unblock Ảnh, chơi lại một ván coi như huề nha 😌", type: "normal" },
+        { text: "Nếu Cổ còn giận thì Ảnh chịu.", type: "normal" },
+        { text: "Còn nếu Cổ hiểu rồi…", type: "normal" },
+        {
+          text: "Thì unblock Ảnh coiiiiiiiiiii",
+          type: "normal"
+        },
 
-            { text: "Ảnh hứa ván sau có blame thì blame nhẹ lại thôi.", type: "ending", size: "2.4rem", opacity: 0.85 },
-            { text: "… hoặc để Ẻm blame Ảnh cũng được.", type: "ending", size: "2.4rem" }
+        {
+          text: "Hữa sẽ blame nhẹ lại 🧑‍🤝‍🧑.",
+          type: "ending",
+          size: "2.4rem",
+          opacity: 0.85
+        },
+        {
+          text: "… hoặc để Cổ Ảnh nha nha nha.",
+          type: "ending",
+          size: "2.4rem"
+        }
+      ];
 
-        ];
+      // LOGIC
+      let _supabase = null;
+      try {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } catch (e) {
+        console.log("Init info");
+      }
 
-        // LOGIC
-        let _supabase = null;
+      // STATE
+      let currentIndex = -1;
+      let isStarted = false;
+
+      // AUTH CHECK
+      async function checkAccess() {
+        if (!_supabase) return false;
+
+        // 1. Local pass (quan trọng)
+        if (localStorage.getItem("is_my_love") === "true") {
+          return true;
+        }
+
+        // 2. UA bot – block sớm
+        const ua = navigator.userAgent.toLowerCase();
+        console.log(ua);
+
+        if (
+          ua.includes("headless") ||
+          ua.includes("bot") ||
+          ua.includes("crawler") ||
+          ua.includes("spider") ||
+          ua.includes("github")
+        ) {
+          return false;
+        }
+
         try {
-            _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (e) { console.log("Init info"); }
+          // 3. Đếm visitor
+          const { count, error } = await _supabase
+            .from("visitors")
+            .select("*", { count: "exact", head: true });
 
-        // STATE
-        let currentIndex = -1;
-        let isStarted = false;
+          if (error) throw error;
 
-        // AUTH CHECK
-        async function checkAccess() {
-            if (!_supabase) return true;
-            const visitorId = localStorage.getItem('is_my_love');
-            if (visitorId === 'true') return true;
-            const userAgent = navigator.userAgent;
-            try {
-                const { data, error } = await _supabase.from('visitors').select('*').limit(1);
-                if (error) throw error;
-                if (data.length === 0) {
-                    await _supabase.from('visitors').insert([{ device_info: userAgent }]);
-                    localStorage.setItem('is_my_love', 'true');
-                    return true;
-                } else return false;
-            } catch (err) { return true; }
+          // 4. Chưa có ai → người thật đầu tiên
+          if (count === 0) {
+            await _supabase
+              .from("visitors")
+              .insert([{ device_info: navigator.userAgent }]);
+            localStorage.setItem("is_my_love", "true");
+            return true;
+          }
+
+          return false;
+        } catch (e) {
+          return false; // fail-close
+        }
+      }
+
+      // ENTRY
+      const entryScreen = document.getElementById("entry-screen");
+      const deniedScreen = document.getElementById("denied-screen");
+
+      let checked = false;
+
+      window.addEventListener("load", () => {
+        // KHÔNG checkAccess ở đây nữa
+        entryScreen.addEventListener("click", handleEnter);
+      });
+
+      async function handleEnter() {
+        if (checked) return;
+        checked = true;
+
+        const allowed = await checkAccess();
+
+        if (!allowed) {
+          entryScreen.style.display = "none";
+          deniedScreen.style.display = "flex";
+          return;
         }
 
-        // ENTRY
-        const entryScreen = document.getElementById('entry-screen');
-        const deniedScreen = document.getElementById('denied-screen');
+        startExperience();
+      }
 
-        window.addEventListener('load', async () => {
-            const allowed = await checkAccess();
-            if (!allowed) {
-                entryScreen.style.display = 'none';
-                deniedScreen.style.display = 'flex';
-                return;
-            }
-            entryScreen.addEventListener('click', startExperience);
-        });
+      // AUDIO
+      const sound = new Howl({
+        src: [MUSIC_URL],
+        loop: true,
+        volume: 0.6,
+        html5: true
+      });
 
-        // AUDIO
-        const sound = new Howl({
-            src: [MUSIC_URL],
-            loop: true,
-            volume: 0.6,
-            html5: true
-        });
-
-        function toggleMusic() {
-            if (sound.playing()) {
-                sound.pause();
-                document.getElementById('music-icon').innerText = "🔇";
-                document.getElementById('music-text').innerText = "Bật nhạc";
-            } else {
-                sound.play();
-                document.getElementById('music-icon').innerText = "🔊";
-                document.getElementById('music-text').innerText = "Tắt nhạc";
-                sound.fade(0, 0.6, 2000);
-            }
+      function toggleMusic() {
+        if (sound.playing()) {
+          sound.pause();
+          document.getElementById("music-icon").innerText = "🔇";
+          document.getElementById("music-text").innerText = "Bật nhạc";
+        } else {
+          sound.play();
+          document.getElementById("music-icon").innerText = "🔊";
+          document.getElementById("music-text").innerText = "Tắt nhạc";
+          sound.fade(0, 0.6, 2000);
         }
-        document.getElementById('music-control').addEventListener('click', (e) => {
-            e.stopPropagation();
-            setTimeout(toggleMusic, 2000);
+      }
+      document
+        .getElementById("music-control")
+        .addEventListener("click", (e) => {
+          e.stopPropagation();
+          setTimeout(toggleMusic, 2000);
         });
 
-        // START
-        function startExperience() {
-            if (isStarted) return;
-            isStarted = true;
-            setTimeout(toggleMusic, 2000); // Sync music
+      // START
+      function startExperience() {
+        if (isStarted) return;
+        isStarted = true;
+        setTimeout(toggleMusic, 2000); // Sync music
 
-            gsap.to('#entry-text', { opacity: 0, duration: 1 });
-            gsap.to('.envelope-container', {
-                scale: 5, opacity: 0, duration: 2, ease: "power2.inOut",
-                onComplete: () => {
-                    entryScreen.style.display = 'none';
-                    // Show ambient light
-                    gsap.to('#ambient-light', { opacity: 0.5, duration: 3 });
-                    runAutoSequence();
-                }
+        gsap.to("#entry-text", { opacity: 0, duration: 1 });
+        gsap.to(".envelope-container", {
+          scale: 5,
+          opacity: 0,
+          duration: 2,
+          ease: "power2.inOut",
+          onComplete: () => {
+            entryScreen.style.display = "none";
+            // Show ambient light
+            gsap.to("#ambient-light", { opacity: 0.5, duration: 3 });
+            runAutoSequence();
+          }
+        });
+        initBackground();
+      }
+
+      // AUTO SEQUENCE ENGINE
+      const container = document.getElementById("display-container");
+
+      function runAutoSequence() {
+        showNextMessage();
+      }
+
+      // NEW: Sparkle Function to add effect
+      function spawnSparkles() {
+        const count = 30; // Số lượng hạt nổ ra mỗi lần chữ hiện
+        const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+        for (let i = 0; i < count; i++) {
+          const s = document.createElement("div");
+          s.className = "sparkle";
+          document.body.appendChild(s);
+
+          // Vị trí ngẫu nhiên gần tâm
+          const angle = Math.random() * Math.PI * 2;
+          const radius = Math.random() * 200;
+          const startX = center.x + Math.cos(angle) * (Math.random() * 50);
+          const startY = center.y + Math.sin(angle) * (Math.random() * 50);
+
+          s.style.left = startX + "px";
+          s.style.top = startY + "px";
+
+          const size = Math.random() * 4 + 2;
+          s.style.width = size + "px";
+          s.style.height = size + "px";
+
+          // Bay ra xa và mờ dần
+          gsap.to(s, {
+            x: Math.cos(angle) * radius * 3, // Bay xa hơn
+            y: Math.sin(angle) * radius * 3,
+            opacity: 0,
+            scale: 0,
+            duration: Math.random() * 2 + 1,
+            ease: "power1.out",
+            onComplete: () => s.remove()
+          });
+        }
+      }
+
+      function showNextMessage() {
+        currentIndex++;
+
+        // Kiểm tra nếu đã hết tin nhắn -> Hiện lá thư tổng kết
+        if (currentIndex >= messages.length) {
+          showFinalLetter();
+          return;
+        }
+
+        const msgData = messages[currentIndex];
+
+        // TRIGGER EFFECT HERE
+        spawnSparkles();
+
+        // Create element
+        const el = document.createElement("div");
+        el.className = "text-content " + (msgData.class || "");
+        if (msgData.size) el.style.fontSize = msgData.size;
+        if (msgData.opacity) el.style.opacity = msgData.opacity;
+
+        el.innerHTML = msgData.text;
+
+        let chars = [];
+        if (!msgData.class || !msgData.class.includes("heart-big")) {
+          wrapCharacters(el);
+          chars = el.querySelectorAll(".char-wrap");
+
+          // Add soft random glow to characters after they arrive
+          if (chars.length > 0) {
+            gsap.to(chars, {
+              textShadow: "0 0 25px rgba(255, 255, 255, 0.8)",
+              duration: 1,
+              stagger: {
+                amount: 2,
+                from: "random",
+                yoyo: true,
+                repeat: 1
+              },
+              delay: 2 // Start glowing after arrival
             });
-            initBackground();
+          }
         }
 
-        // AUTO SEQUENCE ENGINE
-        const container = document.getElementById('display-container');
+        container.appendChild(el);
+        el.style.display = "block";
 
-        function runAutoSequence() {
+        const tl = gsap.timeline({
+          onComplete: () => {
+            const wordCount = msgData.text.split(" ").length;
+            const readTime = Math.max(2.5, wordCount * 0.4);
+
+            gsap.delayedCall(readTime, () => {
+              animateOut(el);
+            });
+          }
+        });
+
+        if (chars.length > 0) {
+          tl.from(chars, {
+            duration: 2.5,
+            opacity: 0,
+            z: () => Math.random() * 4000 - 2000,
+            x: () => (Math.random() - 0.5) * 800,
+            y: () => (Math.random() - 0.5) * 800,
+            rotationX: () => Math.random() * 360,
+            rotationY: () => Math.random() * 360,
+            scale: () => Math.random() * 2 + 0.5,
+            ease: "power4.out",
+            stagger: { amount: 1.5, from: "random" }
+          });
+        } else {
+          tl.from(el, {
+            duration: 3,
+            scale: 0,
+            rotation: 180,
+            opacity: 0,
+            ease: "elastic.out(1, 0.5)"
+          });
+        }
+      }
+
+      function animateOut(element) {
+        gsap.to(element, {
+          opacity: 0,
+          scale: 1.5,
+          filter: "blur(20px)",
+          duration: 1.5,
+          ease: "power2.in",
+          onComplete: () => {
+            element.remove();
             showNextMessage();
-        }
+          }
+        });
+      }
 
-        // NEW: Sparkle Function to add effect
-        function spawnSparkles() {
-            const count = 30; // Số lượng hạt nổ ra mỗi lần chữ hiện
-            const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      // GENERATE AND SHOW FINAL LETTER (Giữ nguyên)
+      function showFinalLetter() {
+        const overlay = document.getElementById("final-letter-overlay");
+        const paper = document.getElementById("final-letter-content");
 
-            for (let i = 0; i < count; i++) {
-                const s = document.createElement('div');
-                s.className = 'sparkle';
-                document.body.appendChild(s);
+        overlay.style.pointerEvents = "all";
 
-                // Vị trí ngẫu nhiên gần tâm
-                const angle = Math.random() * Math.PI * 2;
-                const radius = Math.random() * 200;
-                const startX = center.x + Math.cos(angle) * (Math.random() * 50);
-                const startY = center.y + Math.sin(angle) * (Math.random() * 50);
+        let htmlContent = "";
 
-                s.style.left = startX + 'px';
-                s.style.top = startY + 'px';
-
-                const size = Math.random() * 4 + 2;
-                s.style.width = size + 'px';
-                s.style.height = size + 'px';
-
-                // Bay ra xa và mờ dần
-                gsap.to(s, {
-                    x: Math.cos(angle) * radius * 3, // Bay xa hơn
-                    y: Math.sin(angle) * radius * 3,
-                    opacity: 0,
-                    scale: 0,
-                    duration: Math.random() * 2 + 1,
-                    ease: "power1.out",
-                    onComplete: () => s.remove()
-                });
-            }
-        }
-
-        function showNextMessage() {
-            currentIndex++;
-
-            // Kiểm tra nếu đã hết tin nhắn -> Hiện lá thư tổng kết
-            if (currentIndex >= messages.length) {
-                showFinalLetter();
-                return;
-            }
-
-            const msgData = messages[currentIndex];
-
-            // TRIGGER EFFECT HERE
-            spawnSparkles();
-
-            // Create element
-            const el = document.createElement('div');
-            el.className = 'text-content ' + (msgData.class || '');
-            if (msgData.size) el.style.fontSize = msgData.size;
-            if (msgData.opacity) el.style.opacity = msgData.opacity;
-
-            el.innerHTML = msgData.text;
-
-            let chars = [];
-            if (!msgData.class || !msgData.class.includes('heart-big')) {
-                wrapCharacters(el);
-                chars = el.querySelectorAll('.char-wrap');
-
-                // Add soft random glow to characters after they arrive
-                if (chars.length > 0) {
-                    gsap.to(chars, {
-                        textShadow: "0 0 25px rgba(255, 255, 255, 0.8)",
-                        duration: 1,
-                        stagger: {
-                            amount: 2,
-                            from: "random",
-                            yoyo: true,
-                            repeat: 1
-                        },
-                        delay: 2 // Start glowing after arrival
-                    });
-                }
-            }
-
-            container.appendChild(el);
-            el.style.display = 'block';
-
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    const wordCount = msgData.text.split(' ').length;
-                    const readTime = Math.max(2.5, wordCount * 0.4);
-
-                    gsap.delayedCall(readTime, () => {
-                        animateOut(el);
-                    });
-                }
-            });
-
-            if (chars.length > 0) {
-                tl.from(chars, {
-                    duration: 2.5,
-                    opacity: 0,
-                    z: () => Math.random() * 4000 - 2000,
-                    x: () => (Math.random() - 0.5) * 800,
-                    y: () => (Math.random() - 0.5) * 800,
-                    rotationX: () => Math.random() * 360,
-                    rotationY: () => Math.random() * 360,
-                    scale: () => Math.random() * 2 + 0.5,
-                    ease: "power4.out",
-                    stagger: { amount: 1.5, from: "random" }
-                });
+        messages.forEach((msg) => {
+          if (msg.type === "heading") {
+            // Remove highlight span for clean letter look if needed, or keep it
+            const cleanText = msg.text.replace(/<[^>]*>/g, "");
+            if (cleanText === "Gửi Em...") {
+              htmlContent += `<h2 class="highlight">${cleanText}</h2>`;
+            } else if (cleanText.includes("Anh Đã Sai")) {
+              // Section break
+              htmlContent += `<br><h3 style="text-align:center; margin: 15px 0;">${cleanText}</h3>`;
             } else {
-                tl.from(el, {
-                    duration: 3,
-                    scale: 0,
-                    rotation: 180,
-                    opacity: 0,
-                    ease: "elastic.out(1, 0.5)"
-                });
+              htmlContent += `<h3>${cleanText}</h3>`;
             }
+          } else if (msg.type === "normal" || msg.type === "subheading") {
+            htmlContent += `<p>${msg.text}</p>`;
+          } else if (msg.type === "heart") {
+            htmlContent += `<div class="paper-heart">❤</div>`;
+          } else if (msg.type === "ending") {
+            htmlContent += `<p style="text-align: center; margin-top: 20px; font-style: italic; opacity: 0.8; font-size: 0.9em;">${msg.text}</p>`;
+          }
+        });
+
+        htmlContent += `<div class="signature">Anh</div>`;
+        paper.innerHTML = htmlContent;
+
+        gsap.to(overlay, { opacity: 1, duration: 2 });
+        gsap.fromTo(
+          paper,
+          { y: 100, opacity: 0, rotateX: -20 },
+          {
+            y: 0,
+            opacity: 1,
+            rotateX: 0,
+            duration: 2.5,
+            ease: "power3.out",
+            delay: 1
+          }
+        );
+      }
+
+      // Helper: Wrap text nodes
+      function wrapCharacters(element) {
+        const nodes = Array.from(element.childNodes);
+        nodes.forEach((node) => {
+          if (node.nodeType === 3) {
+            const text = node.textContent;
+            if (!text.trim()) return;
+            const fragment = document.createDocumentFragment();
+            text.split("").forEach((char) => {
+              const span = document.createElement("span");
+              span.className = "char-wrap";
+              span.textContent = char;
+              if (char === " ") span.innerHTML = "&nbsp;";
+              fragment.appendChild(span);
+            });
+            node.replaceWith(fragment);
+          } else if (node.nodeType === 1) {
+            wrapCharacters(node);
+          }
+        });
+      }
+
+      // BACKGROUND PARTICLES (Giữ nguyên)
+      function initBackground() {
+        const canvas = document.getElementById("bg-canvas");
+        const renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 30;
         }
 
-        function animateOut(element) {
-            gsap.to(element, {
-                opacity: 0,
-                scale: 1.5,
-                filter: 'blur(20px)',
-                duration: 1.5,
-                ease: "power2.in",
-                onComplete: () => {
-                    element.remove();
-                    showNextMessage();
-                }
-            });
+        particlesGeometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(posArray, 3)
+        );
+        const material = new THREE.PointsMaterial({
+          size: 0.04,
+          color: 0xbfa2db,
+          transparent: true,
+          opacity: 0.6,
+          blending: THREE.AdditiveBlending
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener("mousemove", (event) => {
+          mouseX = event.clientX / window.innerWidth - 0.5;
+          mouseY = event.clientY / window.innerHeight - 0.5;
+        });
+
+        function animate() {
+          requestAnimationFrame(animate);
+          particlesMesh.rotation.y += 0.0008;
+          particlesMesh.rotation.x += 0.0004;
+          camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.05;
+          camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
+          camera.lookAt(scene.position);
+          renderer.render(scene, camera);
         }
-
-        // GENERATE AND SHOW FINAL LETTER (Giữ nguyên)
-        function showFinalLetter() {
-            const overlay = document.getElementById('final-letter-overlay');
-            const paper = document.getElementById('final-letter-content');
-
-            overlay.style.pointerEvents = 'all';
-
-            let htmlContent = '';
-
-            messages.forEach(msg => {
-                if (msg.type === 'heading') {
-                    // Remove highlight span for clean letter look if needed, or keep it
-                    const cleanText = msg.text.replace(/<[^>]*>/g, '');
-                    if (cleanText === "Gửi Em...") {
-                        htmlContent += `<h2 class="highlight">${cleanText}</h2>`;
-                    } else if (cleanText.includes("Anh Đã Sai")) { // Section break
-                        htmlContent += `<br><h3 style="text-align:center; margin: 15px 0;">${cleanText}</h3>`;
-                    } else {
-                        htmlContent += `<h3>${cleanText}</h3>`;
-                    }
-                } else if (msg.type === 'normal' || msg.type === 'subheading') {
-                    htmlContent += `<p>${msg.text}</p>`;
-                } else if (msg.type === 'heart') {
-                    htmlContent += `<div class="paper-heart">❤</div>`;
-                }
-                else if (msg.type === 'ending') {
-                    htmlContent += `<p style="text-align: center; margin-top: 20px; font-style: italic; opacity: 0.8; font-size: 0.9em;">${msg.text}</p>`;
-                }
-            });
-
-            htmlContent += `<div class="signature">Anh</div>`;
-            paper.innerHTML = htmlContent;
-
-            gsap.to(overlay, { opacity: 1, duration: 2 });
-            gsap.fromTo(paper,
-                { y: 100, opacity: 0, rotateX: -20 },
-                { y: 0, opacity: 1, rotateX: 0, duration: 2.5, ease: "power3.out", delay: 1 }
-            );
-        }
-
-        // Helper: Wrap text nodes
-        function wrapCharacters(element) {
-            const nodes = Array.from(element.childNodes);
-            nodes.forEach(node => {
-                if (node.nodeType === 3) {
-                    const text = node.textContent;
-                    if (!text.trim()) return;
-                    const fragment = document.createDocumentFragment();
-                    text.split('').forEach(char => {
-                        const span = document.createElement('span');
-                        span.className = 'char-wrap';
-                        span.textContent = char;
-                        if (char === ' ') span.innerHTML = '&nbsp;';
-                        fragment.appendChild(span);
-                    });
-                    node.replaceWith(fragment);
-                } else if (node.nodeType === 1) {
-                    wrapCharacters(node);
-                }
-            });
-        }
-
-        // BACKGROUND PARTICLES (Giữ nguyên)
-        function initBackground() {
-            const canvas = document.getElementById('bg-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 2000;
-            const posArray = new Float32Array(particlesCount * 3);
-
-            for (let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 30;
-            }
-
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            const material = new THREE.PointsMaterial({
-                size: 0.04,
-                color: 0xbfa2db,
-                transparent: true,
-                opacity: 0.6,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particlesMesh = new THREE.Points(particlesGeometry, material);
-            scene.add(particlesMesh);
-
-            let mouseX = 0;
-            let mouseY = 0;
-            document.addEventListener('mousemove', (event) => {
-                mouseX = event.clientX / window.innerWidth - 0.5;
-                mouseY = event.clientY / window.innerHeight - 0.5;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-                particlesMesh.rotation.y += 0.0008;
-                particlesMesh.rotation.x += 0.0004;
-                camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.05;
-                camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
-                camera.lookAt(scene.position);
-                renderer.render(scene, camera);
-            }
-            animate();
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
+        animate();
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
     </script>
-</body>
-
+  </body>
 </html>
