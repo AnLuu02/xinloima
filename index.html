@@ -427,7 +427,6 @@
       // CONFIG
       const SUPABASE_URL = "https://ebkayysfasvqrpiuikzu.supabase.co";
       const SUPABASE_KEY = "sb_publishable_ZRxjIxnm_dNK4yMq5r_xDw_8g3n1l0E";
-      const MUSIC_URL = "./assets/lily.mp3";
 
       // CONTENT DATA
       const messages = [
@@ -584,37 +583,65 @@
       }
 
       // AUDIO
-      const sound = new Howl({
-        src: [MUSIC_URL],
-        loop: true,
-        volume: 0.6,
-        html5: true
-      });
+      const sounds = [
+        "./assets/piano3.mp3",
+        "./assets/lily.mp3",
+        "./assets/full-house.mp3",
+        "./assets/piano2.mp3",
+        "./assets/piano1.mp3"
+      ];
+      let player;
+      let currentIndexSound = 0;
+      function playSound(index) {
+        if (player) {
+          player?.unload();
+        }
+        player = new Howl({
+          src: [sounds[index]],
+          volume: 0.6,
+          html5: true,
+          onend: function () {
+            nextSound();
+          }
+        });
+        player.play();
+      }
+      function nextSound() {
+        currentIndexSound++;
 
+        if (currentIndexSound >= sounds.length) {
+          currentIndexSound = 0;
+        }
+
+        playSound(currentIndexSound);
+      }
       function toggleMusic() {
-        if (sound.playing()) {
-          sound.pause();
+        if (player.playing()) {
+          player.pause();
           document.getElementById("music-icon").innerText = "🔇";
           document.getElementById("music-text").innerText = "Bật nhạc";
         } else {
-          sound.play();
+          player.play();
           document.getElementById("music-icon").innerText = "🔊";
           document.getElementById("music-text").innerText = "Tắt nhạc";
-          sound.fade(0, 0.6, 2000);
+          player.fade(0, 0.6, 2000);
         }
       }
       document
         .getElementById("music-control")
         .addEventListener("click", (e) => {
           e.stopPropagation();
-          setTimeout(toggleMusic, 2000);
+          toggleMusic();
         });
 
       // START
       function startExperience() {
         if (isStarted) return;
         isStarted = true;
-        setTimeout(toggleMusic, 2000); // Sync music
+        setTimeout(() => {
+          playSound(currentIndexSound);
+          toggleMusic();
+        }, 2000); // Sync music
 
         gsap.to("#entry-text", { opacity: 0, duration: 1 });
         gsap.to(".envelope-container", {
